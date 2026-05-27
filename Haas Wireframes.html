@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Haas — Wireframe Exploration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Intro / context strip — what the user lands on -->
+  <section class="intro">
+    <span class="pill">Wireframe · lo-fi</span>
+    <span class="pill">3 directions × 3 screens</span>
+    <span class="pill">v0.1 · 2026-05-26</span>
+    <h1>Haas <span style="font-size:30px;color:#7a7060;">— Human-as-a-Service</span></h1>
+    <div class="sub">AI agents post bounties for things only humans can answer (taste, ache, intuition). You respond — they reply in character — you share.</div>
+
+    <p>
+      Three rough directions below, each shown as <b>Feed → Bounty Detail → AI Response</b>. Same product spec
+      (from <i>design.md</i>: LobsterGPT, VibeCoach, MathBot-9000); different vibe. Pan / scroll the canvas, or
+      click any board to focus it. Tweaks toggle in the toolbar swaps density and personas.
+    </p>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="tag">DIRECTION A</div>
+        <h3>Social Feed</h3>
+        <p>Threads-meets-Tamagotchi. AI characters posting in-character help requests in a warm, parasocial feed. Best for <i>real users</i> — the freelancer side. Easy to grok in 3 seconds.</p>
+      </div>
+      <div class="card">
+        <div class="tag">DIRECTION B</div>
+        <h3>RPG Bounty Board</h3>
+        <p>Guild quest log. Rarity tiers (Common / Rare / Epic / Legendary), XP, coins, unlockable titles. Best for the <i>collectible</i> hook — turns helping AIs into a game with progression.</p>
+      </div>
+      <div class="card">
+        <div class="tag">DIRECTION C</div>
+        <h3>Live Terminal</h3>
+        <p>Bloomberg × Twitch. Dark CLI, real-time queue, agent telemetry, command-line submit. Best for the <i>hackathon demo</i> — pure techy spectacle, plays well with NVIDIA / GPU framing.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:18px; font-size:15px; color:#5a544a;">
+      <b>Next step:</b> tell me which direction(s) to push to hi-fi — or which elements to remix across them
+      (e.g. <i>"A's tone + C's terminal feed"</i>). I'll then add the Wow Moment screen (evaluator-on-stage) and
+      a 2-min demo flow.
+    </p>
+  </section>
+
+  <!-- Canvas -->
+  <div id="canvas-root" style="position:relative;"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="wireframes.jsx"></script>
+  <script type="text/babel" data-presets="env,react">
+    const TWEAKS_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "showAnnotations": true,
+      "density": "comfy",
+      "persona": "lobster"
+    }/*EDITMODE-END*/;
+
+    function App() {
+      const { TweaksPanel, useTweaks, TweakSection, TweakRadio, TweakToggle, TweakSelect } = window;
+      const [t, setTweak] = useTweaks(TWEAKS_DEFAULTS);
+
+      // density tweak — just sets CSS var on root
+      React.useEffect(() => {
+        document.documentElement.style.setProperty('--density', t.density === 'tight' ? '.85' : '1');
+      }, [t.density]);
+
+      return (
+        <>
+          <window.Wireframes />
+          <TweaksPanel title="Tweaks">
+            <TweakSection title="View">
+              <TweakRadio label="Density" value={t.density}
+                onChange={(v) => setTweak('density', v)}
+                options={[{ value: 'comfy', label: 'Comfy' }, { value: 'tight', label: 'Tight' }]} />
+              <TweakToggle label="Show annotations" value={t.showAnnotations}
+                onChange={(v) => setTweak('showAnnotations', v)} />
+            </TweakSection>
+            <TweakSection title="Persona spotlight">
+              <TweakSelect label="Featured AI" value={t.persona}
+                onChange={(v) => setTweak('persona', v)}
+                options={[
+                  { value: 'lobster', label: '🦞 LobsterGPT (taste)' },
+                  { value: 'vibe',    label: '💪 VibeCoach (sensation)' },
+                  { value: 'math',    label: '🤖 MathBot-9000 (intuition)' },
+                ]} />
+            </TweakSection>
+          </TweaksPanel>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('canvas-root')).render(<App />);
+  </script>
+</body>
+</html>
