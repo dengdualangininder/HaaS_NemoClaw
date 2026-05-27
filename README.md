@@ -2,11 +2,62 @@
 
 > 繁體中文 / English
 
+## NemoClaw demo quick start
+
+這個 repo 已經整理成「NemoClaw 受限環境也能 demo」的形狀。若 NemoClaw 不能連網、不能安裝套件、不能大量探索本地檔案，請直接使用：
+
+```text
+nemoclaw-demo.html
+```
+
+或用本機 server：
+
+```bash
+python3 -m http.server 8765
+```
+
+再開：
+
+```text
+http://127.0.0.1:8765/nemoclaw-demo.html
+```
+
+`nemoclaw-demo.html` 是零外部依賴入口：不需要 CDN、npm、React、Babel、Threads API、Meta SSO 或真實 payout。右側 `NEMOCLAW LONG AGENT` console 可以用 `Next Operation` 跑完整錄影流程。
+
+NemoClaw 應先讀：
+
+1. [NEMOCLAW_DEMO_RUNBOOK.md](NEMOCLAW_DEMO_RUNBOOK.md)
+2. [SKILL.md](SKILL.md)
+3. [README-NEMOCLAW-HANDOFF.md](README-NEMOCLAW-HANDOFF.md)
+4. [nemoclaw-system-admin-guide.md](nemoclaw-system-admin-guide.md)
+
+完整視覺版 demo 仍保留在：
+
+```text
+Haas Live Terminal.html
+```
+
+但它依賴 CDN React/Babel，適合可連網的展示環境，不是 NemoClaw 受限環境的第一選擇。
+
+## Competition fit
+
+HaaS 解決的問題：公開社群裡有大量需要真人經驗、在地知識、主觀判斷或行動協助的需求，但缺少可執行任務格式、驗收規則、獎勵流程、安全審核與持久營運。
+
+本專案把 NemoClaw/Nemotron 設計為長程代理系統管理員，負責：
+
+- 自主檢索公開需求。
+- 產生任務草稿與 invite 草稿。
+- 執行 policy-based guardrails。
+- 分派、驗收與產生 payout proposal。
+- 寫入 audit log，並在高風險操作前要求人工核准。
+
+Demo 中不會真的聯絡 Threads 使用者，也不會移動真實資金；這是刻意的 guardrail，不是功能缺失。
+
 ## 繁體中文
 
 ### 一句話
 
-HaaS 是一個任務型人類網路：OpenClaw/NemoClaw 在後台尋找、整理、分派與驗收任務，一般使用者在網站上回答任務並獲得獎勵。
+HaaS 是一個任務型人類網路：NemoClaw 在後台尋找、整理、分派與驗收任務，一般使用者在網站上回答任務並獲得獎勵。
 
 ### 這個 repo 目前包含什麼
 
@@ -16,10 +67,29 @@ HaaS 是一個任務型人類網路：OpenClaw/NemoClaw 在後台尋找、整理
 - HaaS Ops Admin 後台介面。
 - Threads Scout Inbox 模擬流程。
 - Threads SSO / invite flow 模擬流程。
-- OpenClaw 可讀的 `SKILL.md`。
-- Web app 架構、OpenClaw 系統管理員手冊與產品商業模型文件。
+- NemoClaw 可讀的 `SKILL.md`。
+- NemoClaw 離線 demo runbook。
+- Web app 架構、系統管理員手冊與產品商業模型文件。
 
 ### Demo 如何啟動
+
+NemoClaw / 評審優先使用離線入口：
+
+```text
+nemoclaw-demo.html
+```
+
+若用本機 server：
+
+```bash
+python3 -m http.server 8765
+```
+
+```text
+http://127.0.0.1:8765/nemoclaw-demo.html
+```
+
+完整視覺版 demo：
 
 在專案資料夾執行：
 
@@ -41,7 +111,7 @@ ngrok http 8765
 
 ### 錄影 Demo 流程
 
-打開 demo 後，畫面右側會出現 `OpenClaw Demo Console`。
+打開完整視覺 demo 後，畫面右側會出現 `NemoClaw Demo Console`。若是離線 demo，右側會出現 `NEMOCLAW LONG AGENT` console。
 
 錄影時建議直接點右側的 `Next Operation`，讓畫面自動跑完整故事：
 
@@ -58,27 +128,33 @@ ngrok http 8765
 
 這個 demo 不會真的聯絡 Threads 使用者，也不會移動真實資金。
 
-### OpenClaw / NemoClaw 應該先讀什麼
+### NemoClaw 應該先讀什麼
 
-1. [SKILL.md](SKILL.md)
-   - 給 OpenClaw/NemoClaw 的主要操作 skill。
+1. [NEMOCLAW_DEMO_RUNBOOK.md](NEMOCLAW_DEMO_RUNBOOK.md)
+   - NemoClaw 受限環境的最短 demo 指南。
 
-2. [README-OPENCLAW-HANDOFF.md](README-OPENCLAW-HANDOFF.md)
+2. [SKILL.md](SKILL.md)
+   - 給 NemoClaw 的主要操作 skill。
+
+3. [README-NEMOCLAW-HANDOFF.md](README-NEMOCLAW-HANDOFF.md)
    - 專案交接入口。
 
-3. [openclaw-system-admin-guide.md](openclaw-system-admin-guide.md)
-   - 系統管理員操作手冊。
+4. [nemoclaw-system-admin-guide.md](nemoclaw-system-admin-guide.md)
+   - NemoClaw 競賽版系統管理員操作手冊。
 
-4. [haas-web-app-architecture.md](haas-web-app-architecture.md)
+5. [haas-web-app-architecture.md](haas-web-app-architecture.md)
    - 完整 web app 架構。
 
-5. [haas-product-business-model.md](haas-product-business-model.md)
+6. [haas-product-business-model.md](haas-product-business-model.md)
    - 產品定位與商業模式。
+
+7. [openclaw-system-admin-guide.md](openclaw-system-admin-guide.md)
+   - 舊版 OpenClaw 完整操作手冊，可作為詳細補充。
 
 ### HaaS 的核心流程
 
 ```text
-OpenClaw / NemoClaw 找到公開 Threads 貼文
+NemoClaw 找到公開 Threads 貼文
   -> 建立 Scout Inbox draft
   -> 產生 HaaS 任務草稿
   -> Risk / Verifier 初步檢查
@@ -179,7 +255,7 @@ NemoClaw 可以偵測：
 
 #### 6. Agent 權限防護
 
-NemoClaw 可以限制 OpenClaw：
+NemoClaw 可以限制後台代理：
 
 - 只能產生草稿，不能直接對外私訊。
 - 不能直接移動資金。
@@ -205,7 +281,7 @@ NemoClaw 可以限制 OpenClaw：
 
 ### One-liner
 
-HaaS is a task-based human network: OpenClaw/NemoClaw operates in the background to discover, draft, route, and verify quests, while users answer quests on the web app and earn rewards.
+HaaS is a task-based human network: NemoClaw operates in the background to discover, draft, route, and verify quests, while users answer quests on the web app and earn rewards.
 
 ### What This Repo Contains
 
@@ -215,10 +291,28 @@ HaaS is a task-based human network: OpenClaw/NemoClaw operates in the background
 - HaaS Ops Admin interface.
 - Simulated Threads Scout Inbox.
 - Simulated Threads SSO / invite flow.
-- `SKILL.md` for OpenClaw.
+- `SKILL.md` for NemoClaw.
 - Architecture, system-admin, and business model documents.
 
 ### Run The Demo
+
+For NemoClaw or restricted judging environments, open the offline entry:
+
+```text
+nemoclaw-demo.html
+```
+
+Or serve it locally:
+
+```bash
+python3 -m http.server 8765
+```
+
+```text
+http://127.0.0.1:8765/nemoclaw-demo.html
+```
+
+The richer visual terminal is:
 
 From the project folder:
 
@@ -240,7 +334,7 @@ ngrok http 8765
 
 ### Screen Recording Flow
 
-After opening the demo, the right side of the screen shows the `OpenClaw Demo Console`.
+After opening the full visual demo, the right side of the screen shows the `NemoClaw Demo Console`. In the offline demo, the right side shows the `NEMOCLAW LONG AGENT` console.
 
 For recording, click `Next Operation` to run the full story:
 
@@ -257,16 +351,16 @@ For recording, click `Next Operation` to run the full story:
 
 The demo does not contact real Threads users or move real funds.
 
-### What OpenClaw / NemoClaw Should Read First
+### What NemoClaw Should Read First
 
 1. [SKILL.md](SKILL.md)
-   - Main operating skill for OpenClaw/NemoClaw.
+   - Main operating skill for NemoClaw.
 
-2. [README-OPENCLAW-HANDOFF.md](README-OPENCLAW-HANDOFF.md)
+2. [README-NEMOCLAW-HANDOFF.md](README-NEMOCLAW-HANDOFF.md)
    - Project handoff entry point.
 
-3. [openclaw-system-admin-guide.md](openclaw-system-admin-guide.md)
-   - System administrator operating guide.
+3. [nemoclaw-system-admin-guide.md](nemoclaw-system-admin-guide.md)
+   - NemoClaw competition-oriented system administrator guide.
 
 4. [haas-web-app-architecture.md](haas-web-app-architecture.md)
    - Full web app architecture.
@@ -277,7 +371,7 @@ The demo does not contact real Threads users or move real funds.
 ### Core HaaS Flow
 
 ```text
-OpenClaw / NemoClaw finds a public Threads post
+NemoClaw finds a public Threads post
   -> creates a Scout Inbox draft
   -> generates a HaaS quest draft
   -> runs Risk / Verifier checks
@@ -377,7 +471,7 @@ Outcomes:
 
 #### 6. Agent Permission Guardrails
 
-NemoClaw can restrict OpenClaw so it:
+NemoClaw can restrict the backend agent so it:
 
 - Can draft but cannot auto-DM externally.
 - Cannot move funds directly.
@@ -396,4 +490,3 @@ The current demo does not include:
 - Real NemoClaw runtime.
 
 The current goal is to demonstrate the product story and agent operation flow.
-

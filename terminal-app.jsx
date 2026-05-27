@@ -33,13 +33,13 @@ const UI = {
     scoutInbox: 'Scout Inbox',
     actionable: 'actionable',
     questDraft: 'Quest Master Draft',
-    foundBy: 'found by OpenClaw Scout',
+    foundBy: 'found by NemoClaw Scout',
     confidence: 'confidence',
     generatedBounty: 'generated social bounty · verifier rubric attached',
     approve: 'approve bounty',
     approved: 'approved to bounty board',
     openInvite: 'open invite flow',
-    activity: 'OpenClaw Activity',
+    activity: 'NemoClaw Activity',
     inviteDraft: 'Invite Draft',
     simulateClick: 'simulate Threads click',
     backOps: '← back to ops',
@@ -105,13 +105,13 @@ const UI = {
     scoutInbox: 'Threads 偵測箱',
     actionable: '可處理',
     questDraft: '任務草稿',
-    foundBy: 'OpenClaw Scout 找到',
+    foundBy: 'NemoClaw Scout 找到',
     confidence: '信心分數',
     generatedBounty: '已生成社群任務 · 附驗收規則',
     approve: '核准成任務',
     approved: '已上架到任務板',
     openInvite: '開啟邀請流程',
-    activity: 'OpenClaw 動態',
+    activity: 'NemoClaw 動態',
     inviteDraft: '邀請文草稿',
     simulateClick: '模擬 Threads 點擊',
     backOps: '← 回營運後台',
@@ -170,7 +170,7 @@ const OC_DEMO_STEPS = [
   {
     title: 'Boot HaaS demo',
     zh: '載入 HaaS 任務市場',
-    detail: 'OpenClaw 確認前台任務板、營運後台與 Threads invite flow 都可操作。',
+    detail: 'NemoClaw 確認前台任務板、營運後台與 Threads invite flow 都可操作。',
     cmd: 'open haas://terminal',
   },
   {
@@ -182,8 +182,8 @@ const OC_DEMO_STEPS = [
   {
     title: 'Open Ops Admin',
     zh: '進入 HaaS 營運後台',
-    detail: 'OpenClaw 進入 Scout Inbox，準備審核從 Threads 找到的貼文。',
-    cmd: 'openclaw ops.admin',
+    detail: 'NemoClaw 進入 Scout Inbox，準備審核從 Threads 找到的貼文。',
+    cmd: 'nemoclaw ops.admin',
   },
   {
     title: 'Review scout lead',
@@ -212,7 +212,7 @@ const OC_DEMO_STEPS = [
   {
     title: 'Draft human context',
     zh: '填入真人脈絡回答',
-    detail: 'OpenClaw 只協助帶入草稿，真正內容代表真人經驗。',
+    detail: 'NemoClaw 只協助帶入草稿，真正內容代表真人經驗。',
     cmd: 'composer.prefill human_context',
   },
   {
@@ -224,7 +224,7 @@ const OC_DEMO_STEPS = [
   {
     title: 'Completion card',
     zh: '完成卡與社群回流',
-    detail: '完成卡可以分享或儲存；OpenClaw 不會自動替使用者發文。',
+    detail: '完成卡可以分享或儲存；NemoClaw 不會自動替使用者發文。',
     cmd: 'share_card.ready',
   },
 ];
@@ -710,7 +710,7 @@ function OpsAdminPanel({ leads, selectedLead, onSelectLead, onApproveLead, onOpe
           <div className="glyph">OC</div>
           <div>
             <div className="name">HaaS Ops</div>
-            <div className="tagline">OpenClaw scout · quest master · verifier queue</div>
+            <div className="tagline">NemoClaw scout · quest master · verifier queue</div>
           </div>
         </div>
         <div className="pill-live">{leads.length} social leads in scout inbox</div>
@@ -956,11 +956,11 @@ function ThreadsComposerPanel({ bounty, lead, persona, onBack, onSubmit, lang, i
   );
 }
 
-function OpenClawDemoConsole({ open, step, view, lead, bounty, onToggle, onNext, onReset }) {
+function NemoClawDemoConsole({ open, step, view, lead, bounty, onToggle, onNext, onReset }) {
   if (!open) {
     return (
       <button className="oc-console-tab" onClick={onToggle}>
-        OpenClaw Demo
+        NemoClaw Demo
       </button>
     );
   }
@@ -972,7 +972,7 @@ function OpenClawDemoConsole({ open, step, view, lead, bounty, onToggle, onNext,
     <aside className="oc-console">
       <div className="oc-head">
         <div>
-          <div className="oc-kicker">OPENCLAW SYSTEM ADMIN</div>
+          <div className="oc-kicker">NEMOCLAW SYSTEM ADMIN</div>
           <div className="oc-title">Live Demo Runbook</div>
         </div>
         <button onClick={onToggle}>hide</button>
@@ -1024,7 +1024,7 @@ function OpenClawDemoConsole({ open, step, view, lead, bounty, onToggle, onNext,
       </div>
 
       <div className="oc-warning">
-        Demo only: OpenClaw does not contact real Threads users or move funds.
+        Demo only: NemoClaw does not contact real Threads users or move funds.
       </div>
     </aside>
   );
@@ -1171,7 +1171,7 @@ function App() {
     }
   };
 
-  const resetOpenClawDemo = () => {
+  const resetNemoClawDemo = () => {
     setOcStep(0);
     setOcPrefillAnswer('');
     setLang('en');
@@ -1183,7 +1183,7 @@ function App() {
     setBounties(seedBounties);
   };
 
-  const runOpenClawStep = () => {
+  const runNemoClawStep = () => {
     const lead = scoutLeads[0];
     if (!lead) return;
 
@@ -1255,7 +1255,7 @@ function App() {
           {t.lang}
         </button>
         <button className="oc-toggle" onClick={() => setOcConsoleOpen(v => !v)}>
-          OpenClaw Demo
+          NemoClaw Demo
         </button>
         <div className="right">
           <span>env <span className="v acc">prod</span></span>
@@ -1330,22 +1330,22 @@ function App() {
         )}
       </div>
 
-      <OpenClawDemoConsole
+      <NemoClawDemoConsole
         open={ocConsoleOpen}
         step={ocStep}
         view={view}
         lead={activeLead}
         bounty={activeBounty}
         onToggle={() => setOcConsoleOpen(v => !v)}
-        onNext={runOpenClawStep}
-        onReset={resetOpenClawDemo}
+        onNext={runNemoClawStep}
+        onReset={resetNemoClawDemo}
       />
 
       <div className="cmdline">
         <span className="ps1">haas@terminal:~$</span>
         <span className="cmd">
           {view === 'queue' && 'awaiting bounty selection…'}
-          {view === 'admin' && `openclaw scout --review ${activeLead?.id || 'inbox'}`}
+          {view === 'admin' && `nemoclaw scout --review ${activeLead?.id || 'inbox'}`}
           {view === 'invite' && `threads oauth --lead ${activeLead?.handle || 'pending'}`}
           {view === 'thread-composer' && `compose social submission ${activeBounty?.id}`}
           {view === 'detail' && `accept ${activeBounty?.id}`}

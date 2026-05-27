@@ -665,7 +665,7 @@ body::before {
   text-transform: uppercase;
 }
 
-/* ─────────── OpenClaw visible demo console ─────────── */
+/* ─────────── NemoClaw visible demo console ─────────── */
 .oc-console,
 .oc-console-tab {
   position: fixed;
