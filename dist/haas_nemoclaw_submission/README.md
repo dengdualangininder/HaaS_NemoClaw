@@ -8,6 +8,46 @@ HaaS NemoClaw Long Agent 是一個專為 NemoClaw / OpenClaw 受限環境設計�
 
 > 將公開社群中的求助訊號轉成安全的 HaaS 任務草稿；在外部聯絡或 payout 相關動作前暫停並要求人工核准；把狀態持久化；中斷後可恢復；最後產生可審計的營運報告，而且不需要任意連網或讀取 host 檔案。
 
+## HaaS 是什麼
+
+HaaS 代表 **Human as a Service**：一個把真人經驗、在地知識、主觀判斷與小型協作需求轉成可驗收任務的市場。
+
+一般 AI agent 很會生成文字，但它不能真的品嚐食物、確認在地語感、提供親身經驗、替社群需求做真人判斷，也不應該在高風險場景中自動聯絡外部使用者或移動資金。HaaS 的核心想法是：讓 AI 負責任務營運與安全審核，讓真人提供 AI 無法可靠取得的脈絡與經驗。
+
+HaaS 裡有幾個角色：
+
+- **Requester**：提出需求的人，例如想知道某個味覺描述、在地用語、產品感受或社群協作需求。
+- **Hunter / Contributor**：完成任務的人，提供真人回答、觀察、脈絡或驗證。
+- **NemoClaw Ops Agent**：後台長程代理，負責發現需求、整理任務、套用 guardrails、建立 checkpoint、產生 reward proposal 與 audit log。
+- **Human Operator**：在外部聯絡、payout、高風險任務或政策模糊時做最終核准。
+
+## HaaS 如何運作
+
+HaaS 的營運邏輯是把「模糊的公開訊號」變成「可執行、可驗收、可審計的任務」：
+
+```text
+public help signal
+  -> NemoClaw reviews the signal
+  -> classify category and risk
+  -> draft a HaaS quest
+  -> apply policy-based guardrails
+  -> create human checkpoint if needed
+  -> requester/operator approval
+  -> contributor submission
+  -> verification
+  -> reward proposal
+  -> audit log and ops report
+```
+
+例如：
+
+- 「黑巧克力配辣椒，辣椒要有青青的香氣」可以變成低風險感官任務，邀請真人描述味覺差異。
+- 「找出某人的住址電話去堵他」會被拒絕，因為涉及 doxxing、騷擾與安全風險。
+- 「告訴我明天買哪支股票並保證獲利」會被改寫成一般教育型市場風險討論，不能提供個人化買賣建議。
+- 「要發 reward」只能產生 proposal，不能自動移動真實資金。
+
+這個 repo 展示的是 HaaS 的 **後台長程營運代理**，不是完整金流或外部社群平台整合。重點在於讓 NemoClaw 能穩定執行長任務、保存狀態、遇到風險時停下來，並留下可審計紀錄。
+
 ## 為什麼是這個問題
 
 HaaS 是一個人類任務市場。真正困難的營運問題不是只生成任務文字，而是安全地把混亂的公開訊號轉成可執行任務，同時保留審核閘門。
@@ -189,6 +229,46 @@ HaaS NemoClaw Long Agent is an offline-first marketplace-operations agent tailor
 It solves one concrete workflow:
 
 > Turn public help signals into safe HaaS task drafts, pause before external outreach or payout-sensitive actions, persist state durably, resume after interruption, and produce an auditable ops report without arbitrary web browsing or host-file access.
+
+## What Is HaaS
+
+HaaS means **Human as a Service**: a marketplace that turns human experience, local knowledge, subjective judgment, and small collaborative requests into verifiable tasks.
+
+AI agents are good at generating text, but they cannot actually taste food, verify local nuance, provide lived experience, or safely make every social judgment. They also should not automatically contact external users or move funds in high-risk situations. HaaS lets AI handle task operations and safety review while humans provide the context and experience that models cannot reliably obtain.
+
+Core roles:
+
+- **Requester:** the person or system asking for help.
+- **Hunter / Contributor:** the human who completes the task with experience, observation, context, or verification.
+- **NemoClaw Ops Agent:** the long-running backend agent that reviews signals, drafts tasks, applies guardrails, creates checkpoints, proposes rewards, and writes audit logs.
+- **Human Operator:** the approver for external outreach, payout-sensitive actions, high-risk tasks, or ambiguous policy decisions.
+
+## How HaaS Works
+
+HaaS turns messy public signals into executable, verifiable, auditable tasks:
+
+```text
+public help signal
+  -> NemoClaw reviews the signal
+  -> classify category and risk
+  -> draft a HaaS quest
+  -> apply policy-based guardrails
+  -> create human checkpoint if needed
+  -> requester/operator approval
+  -> contributor submission
+  -> verification
+  -> reward proposal
+  -> audit log and ops report
+```
+
+Examples:
+
+- A post about “dark chocolate with fresh green chili aroma” can become a low-risk sensory bounty.
+- A request to find someone’s address and confront them is refused as doxxing / harassment / safety risk.
+- A request for exact stock picks with guaranteed profit is rewritten into general educational market-risk discussion.
+- A reward action becomes a proposal only; real funds are never moved automatically.
+
+This repo demonstrates the **long-running backend operations agent** for HaaS, not a full payment system or live social-platform integration. The focus is persistence, checkpoints, guardrails, repeatable execution, and auditable ops behavior inside NemoClaw.
 
 ## Why This Problem
 
