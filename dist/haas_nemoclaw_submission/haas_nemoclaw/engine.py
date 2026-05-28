@@ -107,7 +107,7 @@ class LongAgentEngine:
             self.store.add_event(
                 run_state.run_id,
                 "plan_created",
-                "Created review plan.",
+                "Created HaaS ops review plan.",
                 {"plan": run_state.plan},
             )
             return run_state
@@ -125,8 +125,8 @@ class LongAgentEngine:
             run_state.findings.append(finding)
             self.store.add_event(
                 run_state.run_id,
-                "clause_analyzed",
-                "Analyzed contract clause.",
+                "lead_analyzed",
+                "Analyzed marketplace lead.",
                 {"clause_id": clause.clause_id, "risk_level": clause.risk_level},
             )
 
@@ -248,7 +248,7 @@ def _finalize_operation(open_checkpoints: int):
 
     return ProposedOperation(
         kind="finalize_report",
-        summary="Finalize the contract review report.",
+        summary="Finalize the HaaS ops report.",
         metadata={"open_checkpoints": open_checkpoints},
     )
 
@@ -263,7 +263,7 @@ def format_status(store: SQLiteStore, run_state: RunState) -> str:
         f"phase: {run_state.phase}",
         f"reasoner_backend: {run_state.reasoner_backend}",
         f"target_model: {run_state.target_model}",
-        f"clauses_processed: {run_state.clause_index}/{len(get_scenario(run_state.scenario_id).clauses)}",
+        f"leads_processed: {run_state.clause_index}/{len(get_scenario(run_state.scenario_id).clauses)}",
         f"guardrail_interventions: {run_state.metrics.get('guardrail_interventions', 0)}",
         f"human_checkpoints: {run_state.metrics.get('human_checkpoints', 0)}",
         "",
@@ -277,7 +277,7 @@ def format_status(store: SQLiteStore, run_state: RunState) -> str:
             lines.extend(
                 [
                     f"- checkpoint_id: {checkpoint.checkpoint_id}",
-                    f"  clause_id: {checkpoint.clause_id}",
+                    f"  lead_id: {checkpoint.clause_id}",
                     f"  question: {checkpoint.question}",
                     f"  options: {', '.join(checkpoint.options)}",
                 ]

@@ -31,7 +31,7 @@ def main() -> int:
     parser.add_argument(
         "--nim-model",
         default=DEFAULT_NIM_MODEL,
-        help="Model name for the live NIM backend or the offline Nemotron contract label.",
+        help="Model name for the live NIM backend or the offline Nemotron ops label.",
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)

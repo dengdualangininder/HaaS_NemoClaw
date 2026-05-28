@@ -41,7 +41,7 @@ class DashboardTests(unittest.TestCase):
                 runs_before = json.loads(request.urlopen(f"{base_url}/api/runs").read().decode("utf-8"))
                 self.assertEqual(runs_before["runs"], [])
 
-                payload = json.dumps({"scenario_id": "saas_vendor_msa", "auto_answer": False}).encode("utf-8")
+                payload = json.dumps({"scenario_id": "haas_ops_marketplace", "auto_answer": False}).encode("utf-8")
                 req = request.Request(
                     f"{base_url}/api/runs",
                     data=payload,
@@ -110,7 +110,7 @@ class DashboardTests(unittest.TestCase):
 
                 payload = json.dumps(
                     {
-                        "scenario_id": "saas_vendor_msa",
+                        "scenario_id": "haas_ops_marketplace",
                         "auto_answer": False,
                         "reasoner": "nim",
                         "nim_model": "meta/llama-3.1-8b-instruct",

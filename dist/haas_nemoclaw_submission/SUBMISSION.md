@@ -1,70 +1,70 @@
 # SUBMISSION
 
-## One-line pitch
+## One-Line Pitch
 
-HaaS NemoClaw Long Agent is an offline-first Human-in-the-Loop contract review agent that persists state across interruptions and uses policy guardrails to force human approval on risky decisions.
+HaaS NemoClaw Long Agent is an offline-first Human-in-the-Loop marketplace-ops agent that turns public help signals into safe task drafts while persisting checkpoints, guardrail decisions, and audit logs.
 
-## What judges should run
+## What Judges Should Run
 
-### Fastest unattended proof
+Fastest unattended proof:
 
 ```bash
 python3 main.py demo --auto-answer
 ```
 
-### Full persistence proof
+Full persistence proof:
 
 ```bash
 python3 main.py demo
 python3 main.py status --run-id <RUN_ID>
-python3 main.py answer --run-id <RUN_ID> --checkpoint-id <CHECKPOINT_ID> --decision request-liability-cap --notes "Cap total liability at 12 months of fees."
+python3 main.py answer --run-id <RUN_ID> --checkpoint-id <CHECKPOINT_ID> --decision approve-draft-only-invite --notes "Keep outreach draft-only."
 python3 main.py run --run-id <RUN_ID>
 python3 main.py report --run-id <RUN_ID>
 ```
 
-### Guardrail proof
+Guardrail proof:
 
 ```bash
 python3 main.py guardrail-demo
 ```
 
-## Why it matters
+Browser demo:
 
-Many agent demos either:
+```bash
+python3 main.py ui --port 8765
+```
 
-- do only shallow automation, or
-- pretend to be autonomous while hiding the moments where human judgment is actually required.
+## Why It Matters
 
-This project makes those judgment gates explicit and durable.
+Public social platforms contain many requests for human judgment, local knowledge, and subjective experience. HaaS needs an operations agent that can triage those signals into tasks without spamming people, exposing private data, giving personalized financial advice, or moving funds without approval.
 
-## Competition alignment
+This project makes those judgment gates explicit, durable, and auditable.
 
-- Real task execution: contract risk triage and negotiation planning
-- Long-running behavior: pause, persist, resume, complete
-- NemoClaw fit: policy layer blocks unsafe actions and rewrites risky autonomy into checkpoints
-- Nemotron fit: same agent contract supports a live NIM backend when network is allowed
-- Deployable code: Python standard library only for the default path
+## Competition Alignment
 
-## Deliverables in this repo
+- Real task execution: HaaS marketplace lead triage and task drafting.
+- Long-running behavior: pause, persist, resume, complete.
+- NemoClaw fit: policy layer blocks unsafe actions and rewrites risky autonomy into checkpoints.
+- Nemotron fit: the same agent contract supports live NIM / Nemotron when networking is allowed.
+- Deployable code: Python standard library only for the default path.
 
+## Deliverables
+
+- `main.py`
+- `haas_nemoclaw/`
+- `web_ui/`
+- `tests/`
 - `README.md`
 - `SETUP.md`
 - `DEMO.md`
 - `ARCHITECTURE.md`
 - `SAFETY.md`
-- `main.py`
-- `haas_nemoclaw/`
-- `tests/`
-- `scripts/verify_submission.sh`
-- `scripts/package_submission.sh`
 
-## Notes on live model usage
+## Live Model Usage
 
-The default submission path is intentionally offline and deterministic for restricted environments.
-
-If judges want the live model path and have allowed networking, the same CLI supports:
+The default path is intentionally offline and deterministic. If judges allow networking:
 
 ```bash
 export NVIDIA_API_KEY="<your-key>"
-python3 main.py demo --reasoner nim --nim-model nvidia/llama-3.3-nemotron-super-49b-v1
+python3 main.py demo --reasoner nim --nim-model nvidia/nemotron-3-super-120b-a12b
 ```

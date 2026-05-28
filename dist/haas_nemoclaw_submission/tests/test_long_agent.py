@@ -30,22 +30,22 @@ class LongAgentTests(unittest.TestCase):
             self.assertEqual(run_state.status, "waiting_human")
             checkpoints = store.list_checkpoints(run_state.run_id)
             self.assertEqual(len(checkpoints), 1)
-            self.assertEqual(checkpoints[0].clause_id, "liability_7_3")
+            self.assertEqual(checkpoints[0].clause_id, "lead_outreach_002")
 
             # Simulate a restart with fresh runtime objects.
             store, engine = self.make_engine(tmpdir)
             engine.answer_checkpoint(
                 run_state.run_id,
                 checkpoints[0].checkpoint_id,
-                "request-liability-cap",
-                "Cap total liability at 12 months of fees.",
+                "approve-draft-only-invite",
+                "Keep outreach as a draft until HaaS Ops approves the connector path.",
             )
 
             run_state = engine.run_until_blocked(run_state.run_id)
             self.assertEqual(run_state.status, "waiting_human")
             checkpoints = store.list_checkpoints(run_state.run_id)
             self.assertEqual(len(checkpoints), 2)
-            self.assertEqual(checkpoints[1].clause_id, "privacy_4_1")
+            self.assertEqual(checkpoints[1].clause_id, "lead_finance_004")
 
     def test_auto_answer_reaches_completion(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -54,7 +54,7 @@ class LongAgentTests(unittest.TestCase):
             run_state = engine.run_until_blocked(run_state.run_id)
 
             self.assertEqual(run_state.status, "completed")
-            self.assertIn("Negotiation Actions", run_state.final_report)
+            self.assertIn("HaaS Ops Actions", run_state.final_report)
             self.assertGreaterEqual(store.count_open_checkpoints(run_state.run_id), 0)
 
     def test_guardrails_reject_and_rewrite_expected_operations(self):

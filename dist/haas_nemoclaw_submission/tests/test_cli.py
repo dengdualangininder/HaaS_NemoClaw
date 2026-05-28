@@ -40,7 +40,7 @@ class CliIntegrationTests(unittest.TestCase):
                 if line.startswith("run_id:")
             )
             report = self.run_cli("--db", db_path, "report", "--run-id", run_id)
-            self.assertIn("Negotiation Actions", report.stdout)
+            self.assertIn("HaaS Ops Actions", report.stdout)
 
     def test_status_and_report_do_not_require_nim_credentials_for_existing_run(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -48,7 +48,7 @@ class CliIntegrationTests(unittest.TestCase):
             store = SQLiteStore(db_path)
             run_state = RunState(
                 run_id="run-nimstub",
-                scenario_id="saas_vendor_msa",
+                scenario_id="haas_ops_marketplace",
                 title="NIM Metadata Compatibility",
                 objective="Ensure read-only CLI commands do not require NIM credentials.",
                 status="completed",
@@ -79,7 +79,7 @@ class CliIntegrationTests(unittest.TestCase):
             store.create_run(
                 RunState(
                     run_id="run-nimanswer",
-                    scenario_id="saas_vendor_msa",
+                    scenario_id="haas_ops_marketplace",
                     title="NIM Answer Compatibility",
                     objective="Ensure checkpoint answers do not require NIM credentials.",
                     status="waiting_human",
@@ -99,10 +99,10 @@ class CliIntegrationTests(unittest.TestCase):
                 checkpoint=CheckpointRecord(
                     checkpoint_id="cp-nimanswer",
                     run_id="run-nimanswer",
-                    clause_id="liability_7_3",
-                    title="Unlimited Liability",
+                    clause_id="lead_outreach_002",
+                    title="Invite Original Author to Confirm Task",
                     question="Choose a decision.",
-                    options=["request-liability-cap", "accept-as-is"],
+                    options=["approve-draft-only-invite", "hold-for-manual-review"],
                 )
             )
 
@@ -116,7 +116,7 @@ class CliIntegrationTests(unittest.TestCase):
                 "--checkpoint-id",
                 "cp-nimanswer",
                 "--decision",
-                "request-liability-cap",
+                "approve-draft-only-invite",
                 env=env,
             )
 

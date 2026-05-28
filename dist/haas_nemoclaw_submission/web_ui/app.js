@@ -7,7 +7,7 @@ const state = {
 };
 
 const SCENARIO_LABELS = {
-  saas_vendor_msa: "Vendor MSA Review",
+  haas_ops_marketplace: "HaaS Ops Review",
 };
 
 function titleCase(text) {
@@ -54,12 +54,12 @@ function formatBackend(backend) {
 function summarizeRun(run) {
   const findings = run.findings?.length || 0;
   if (run.status === "completed") {
-    return `${findings} findings summarized in final report`;
+    return `${findings} leads summarized in final ops report`;
   }
   if (run.status === "waiting_human") {
     return `Paused for operator decision in ${formatPhase(run.phase)}`;
   }
-  return `${findings} findings recorded so far`;
+  return `${findings} lead decisions recorded so far`;
 }
 
 function visibleNemotronModels(models) {
@@ -161,7 +161,7 @@ function resolveModelSelection() {
 async function createRun(autoAnswer) {
   const reasoner = selectedReasoner();
   const payload = {
-    scenario_id: "saas_vendor_msa",
+    scenario_id: "haas_ops_marketplace",
     auto_answer: autoAnswer,
     reasoner,
   };
@@ -306,7 +306,7 @@ function renderRunDetail() {
         <div class="metric-value metric-value-sm">${escapeHtml(formatBackend(run.reasoner_backend))}</div>
       </div>
       <div class="metric-card">
-        <div class="metric-label">Progress</div>
+        <div class="metric-label">Lead Progress</div>
         <div class="metric-value">${run.clause_index} / ${selected.scenario.clause_total}</div>
       </div>
       <div class="metric-card">
@@ -324,9 +324,9 @@ function renderRunDetail() {
     </div>
 
     <div class="detail-section">
-      <div class="lab acc">Findings</div>
+      <div class="lab acc">Lead Decisions</div>
       <div class="finding-list">
-        ${run.findings.length === 0 ? `<div class="empty-state">The run has not analyzed clauses yet.</div>` : run.findings.map((finding) => `
+        ${run.findings.length === 0 ? `<div class="empty-state">The run has not analyzed marketplace leads yet.</div>` : run.findings.map((finding) => `
           <div class="finding-card">
             <div class="finding-top">
               <div class="finding-title">${escapeHtml(finding.title)}</div>

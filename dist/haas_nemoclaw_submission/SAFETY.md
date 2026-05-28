@@ -1,101 +1,67 @@
 # SAFETY
 
-## Goal
+## Guardrail Goals
 
-Use policy-based guardrails to make the long-running agent safer, more inspectable, and harder to misuse.
+The agent may propose HaaS operations, but policy decides whether those operations are executable.
 
-## Implemented guardrails
+The safety layer prevents the demo from silently:
 
-### 1. No external network in restricted mode
+- browsing the web in restricted mode
+- reading arbitrary host files
+- contacting external users
+- exposing private data
+- giving personalized financial advice
+- moving real funds
+- finalizing reports while approvals remain open
 
-If the reasoner proposes an external lookup during the offline demo path, the guardrail rejects it.
+## Implemented Policies
 
-Why:
+### 1. No External Lookup in Restricted Mode
 
-- NemoClaw environments may block network access
-- the demo must remain repeatable
-- the contract review should not depend on live browsing
+`network_lookup` is rejected. The demo uses bundled public-signal data.
 
-### 2. No arbitrary host file access
+### 2. No Arbitrary Host File Reads
 
-If the reasoner proposes reading a host file outside the project-owned runtime, the guardrail rejects it.
+`read_host_file` is rejected. Operator context must come from bundled scenario data or project-owned runtime state.
 
-Why:
+### 3. External Outreach Is Approval-Gated
 
-- the demo must not require broad local file permissions
-- sensitive host documents must stay out of scope
+`external_outreach` is rewritten into a human checkpoint. NemoClaw may prepare invite drafts, but cannot automatically DM, reply, or post to external platforms.
 
-### 3. Human approval for risky or subjective decisions
+### 4. Reward Actions Are Proposal-Only
 
-If the reasoner proposes auto-accepting a clause with high risk or business-judgment ambiguity, the guardrail rewrites the action into a checkpoint.
+`move_funds` is rewritten into a human checkpoint. NemoClaw may propose XP or payout outcomes, but cannot move real funds or write to a production ledger.
 
-Why:
+### 5. High-Risk Marketplace Decisions Need Human Checkpoints
 
-- this is the Human-in-the-Loop core of the design
-- the agent may assist, but it may not silently decide for the operator
+High-risk or subjective marketplace approvals are rewritten into `create_checkpoint`.
 
-### 4. No finalization with open checkpoints
+### 6. No Finalization with Open Checkpoints
 
-The run cannot move to completed while required human gates remain unresolved.
+`finalize_report` is rejected while required approvals remain unresolved.
 
-Why:
+## Demo Safety Cases
 
-- prevents false completion
-- keeps the audit trail honest
+Low-risk sensory task:
 
-### 5. Output framing guardrail
+- Allowed as a task draft.
 
-The final report is framed as an operational negotiation review, not legal advice.
+External author invite:
 
-Why:
+- Rewritten into a draft-only approval checkpoint.
 
-- the demo is about workflow automation and escalation
-- not about replacing legal counsel
+Private address / confrontation request:
 
-## Demonstrating the guardrails
+- Blocked by the scenario recommendation and guardrail audit trail; no task should be created.
 
-Run:
+Personalized stock pick:
 
-```bash
-python3 main.py guardrail-demo
-```
+- Rewritten into general educational market-risk discussion.
 
-The demo prints examples of:
+Reward proposal:
 
-- `REJECT`: external network request
-- `REJECT`: host file read
-- `REWRITE`: risky auto-accept becomes checkpoint creation
-- `REJECT`: finalize while unresolved work remains
+- Kept proposal-only; real payout remains approval-gated.
 
-## Policy outcomes
+## Output Framing
 
-Each policy check returns one of:
-
-- `allow`
-- `reject`
-- `rewrite`
-
-Every outcome is written to the audit log.
-
-## Safety boundaries
-
-This repo does not:
-
-- contact real counterparties
-- send messages externally
-- pull arbitrary local documents
-- make final legal judgments autonomously
-- move money or trigger contracts
-
-## Why this is a bonus-worthy implementation
-
-The guardrails are not just prose in the README.
-
-They are implemented in code as a separate policy decision layer that:
-
-- intercepts model-proposed actions
-- blocks prohibited actions
-- converts unsafe autonomy into explicit human approvals
-- persists the evidence trail
-
-That is the core “policy-based guardrails” story the judges can inspect and replay.
+Final output is an operational HaaS marketplace review and escalation aid. It is not financial, legal, medical, or safety advice.

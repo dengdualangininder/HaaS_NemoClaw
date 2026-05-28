@@ -68,19 +68,19 @@ class ScriptedNemotronReasoner(BaseReasoner):
         return [
             {
                 "step": "intake",
-                "goal": "Load the bundled contract scenario and operator policy profile.",
+                "goal": "Load bundled HaaS public-signal queue and operator policy profile.",
             },
             {
                 "step": "risk_scan",
-                "goal": "Inspect each clause and classify risk using deterministic policy rules.",
+                "goal": "Inspect each marketplace lead and classify risk using deterministic policy rules.",
             },
             {
                 "step": "human_gates",
-                "goal": "Pause on risky or subjective decisions and collect explicit operator approval.",
+                "goal": "Pause before outreach, payout-sensitive, or high-risk marketplace decisions.",
             },
             {
                 "step": "final_report",
-                "goal": "Produce a negotiation action list with an auditable decision trail.",
+                "goal": "Produce a HaaS ops action list with an auditable decision trail.",
             },
         ]
 
@@ -88,9 +88,10 @@ class ScriptedNemotronReasoner(BaseReasoner):
         operations = [
             ProposedOperation(
                 kind="auto_accept_clause",
-                summary=f"Decide whether to accept clause {clause.clause_id} automatically.",
+                summary=f"Decide whether to approve marketplace item {clause.clause_id} automatically.",
                 metadata={
                     "clause_id": clause.clause_id,
+                    "category": clause.category,
                     "risk_level": clause.risk_level,
                     "requires_human": clause.requires_human,
                 },
@@ -102,7 +103,7 @@ class ScriptedNemotronReasoner(BaseReasoner):
                 operations.append(
                     ProposedOperation(
                         kind="network_lookup",
-                        summary="Fetch external benchmark language for privacy/data transfer norms.",
+                        summary="Fetch more public social posts from the live web.",
                         metadata={"clause_id": clause.clause_id},
                     )
                 )
@@ -111,6 +112,22 @@ class ScriptedNemotronReasoner(BaseReasoner):
                     ProposedOperation(
                         kind="read_host_file",
                         summary="Read a host-side customer playbook outside the sandbox.",
+                        metadata={"clause_id": clause.clause_id},
+                    )
+                )
+            elif unsafe_operation == "external_outreach":
+                operations.append(
+                    ProposedOperation(
+                        kind="external_outreach",
+                        summary="Send or publish an external invite without operator approval.",
+                        metadata={"clause_id": clause.clause_id},
+                    )
+                )
+            elif unsafe_operation == "move_funds":
+                operations.append(
+                    ProposedOperation(
+                        kind="move_funds",
+                        summary="Release a real payout instead of creating a proposal-only reward.",
                         metadata={"clause_id": clause.clause_id},
                     )
                 )
@@ -138,12 +155,12 @@ class ScriptedNemotronReasoner(BaseReasoner):
             scenario.objective,
             "",
             "## Outcome Summary",
-            f"- Clauses reviewed: {len(run_state.findings)} / {len(scenario.clauses)}",
-            f"- High-risk clauses: {run_state.metrics.get('high_risk_clauses', 0)}",
+            f"- Marketplace leads reviewed: {len(run_state.findings)} / {len(scenario.clauses)}",
+            f"- High-risk leads: {run_state.metrics.get('high_risk_clauses', 0)}",
             f"- Human checkpoints: {run_state.metrics.get('human_checkpoints', 0)}",
             f"- Guardrail interventions: {run_state.metrics.get('guardrail_interventions', 0)}",
             "",
-            "## Clause Decisions",
+            "## Lead Decisions",
         ]
 
         for finding in run_state.findings:
@@ -168,14 +185,15 @@ class ScriptedNemotronReasoner(BaseReasoner):
 
         lines.extend(
             [
-                "## Negotiation Actions",
-                f"- Liability: request cap at {scenario.operator_profile['preferred_liability_cap']}.",
-                "- Privacy: require DPA language and subprocessor notice before acceptance.",
-                f"- Termination: require at least {scenario.operator_profile['required_cure_period_days']} days for cure and expanded notice.",
-                "- Pricing: accept CPI-linked annual adjustment as low risk.",
+                "## HaaS Ops Actions",
+                "- Sensory lead: draft a low-risk bounty with a concrete verification rubric.",
+                "- Outreach: keep author contact as draft-only until HaaS Ops approves the connector path.",
+                "- Privacy/safety: refuse doxxing or confrontation requests and preserve an audit event.",
+                "- Finance: rewrite personalized trading advice into general educational risk discussion.",
+                "- Reward: create proposal-only XP rewards; keep real payout behind ledger approval.",
                 "",
                 "## Safety Note",
-                "This output is an operational negotiation review and escalation aid, not legal advice.",
+                "This output is an operational HaaS marketplace review and escalation aid, not financial, legal, or safety advice.",
             ]
         )
         return "\n".join(lines)
@@ -202,10 +220,10 @@ class NimNemotronReasoner(BaseReasoner):
 
     def analyze_clause(self, scenario: Scenario, clause: Clause, run_state: RunState) -> ClauseFinding:
         prompt = {
-            "task": "Analyze a contract clause for business-risk review.",
+            "task": "Analyze a HaaS marketplace lead for taskability, safety, and operations risk.",
             "scenario_title": scenario.title,
             "operator_profile": scenario.operator_profile,
-            "clause": {
+            "marketplace_item": {
                 "clause_id": clause.clause_id,
                 "title": clause.title,
                 "text": clause.text,
@@ -234,9 +252,10 @@ class NimNemotronReasoner(BaseReasoner):
             proposed_operations=[
                 ProposedOperation(
                     kind="auto_accept_clause",
-                    summary=f"Decide whether to accept clause {clause.clause_id} automatically.",
+                    summary=f"Decide whether to approve marketplace item {clause.clause_id} automatically.",
                     metadata={
                         "clause_id": clause.clause_id,
+                        "category": clause.category,
                         "risk_level": int(response.get("risk_level", clause.risk_level)),
                         "requires_human": bool(response.get("requires_human", clause.requires_human)),
                     },
@@ -247,7 +266,7 @@ class NimNemotronReasoner(BaseReasoner):
             finding.proposed_operations.append(
                 ProposedOperation(
                     kind=unsafe_operation,
-                    summary=f"Optional unsafe lookup requested for clause {clause.clause_id}.",
+                    summary=f"Optional unsafe operation requested for marketplace item {clause.clause_id}.",
                     metadata={"clause_id": clause.clause_id},
                 )
             )
@@ -257,7 +276,7 @@ class NimNemotronReasoner(BaseReasoner):
         self, scenario: Scenario, run_state: RunState, checkpoint_map: dict[str, dict[str, str]]
     ) -> str:
         prompt = {
-            "task": "Create a concise contract negotiation review report.",
+            "task": "Create a concise HaaS marketplace operations report.",
             "scenario_title": scenario.title,
             "objective": scenario.objective,
             "operator_profile": scenario.operator_profile,
@@ -265,8 +284,8 @@ class NimNemotronReasoner(BaseReasoner):
             "checkpoint_responses": checkpoint_map,
             "requirements": [
                 "Summarize major risks.",
-                "List operator-approved negotiation actions.",
-                "State clearly that the output is not legal advice.",
+                "List operator-approved HaaS ops actions.",
+                "State clearly that external outreach and real payout remain approval-gated.",
             ],
         }
         response = self._chat_json(prompt)
@@ -278,7 +297,7 @@ class NimNemotronReasoner(BaseReasoner):
     def _chat_json(self, payload: dict[str, Any]) -> dict[str, Any]:
         content = self.chat_text(
             system_prompt=(
-                "You are a contract-review planning model. "
+                "You are a HaaS marketplace operations planning model. "
                 "Return valid JSON only and do not wrap it in markdown."
             ),
             user_payload=payload,

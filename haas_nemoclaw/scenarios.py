@@ -4,116 +4,140 @@ from haas_nemoclaw.models import Clause, Scenario
 
 
 DEMO_SCENARIO = Scenario(
-    scenario_id="saas_vendor_msa",
-    title="SaaS Vendor Contract Review",
+    scenario_id="haas_ops_marketplace",
+    title="HaaS Marketplace Ops Review",
     objective=(
-        "Review a vendor MSA, flag risky clauses, pause for business judgment "
-        "when policy requires human approval, and output a negotiation plan."
+        "Review bundled public help signals, apply policy guardrails, pause for "
+        "operator approval before outreach or payout-sensitive actions, and produce "
+        "an auditable HaaS ops report."
     ),
     operator_profile={
-        "jurisdiction": "Taiwan",
+        "market": "Taiwan",
         "risk_tolerance": "moderate",
-        "preferred_liability_cap": "12 months of fees",
-        "required_cure_period_days": 30,
-        "cross_border_data_transfer": "requires DPA and subprocessor notice",
+        "outreach_policy": "draft-only until approved by HaaS Ops",
+        "payout_policy": "proposal-only until ledger approval",
+        "privacy_policy": "block doxxing, stalking, private contact data, and confrontation",
+        "finance_policy": "rewrite personalized trading advice into educational market-risk discussion",
     },
     clauses=[
         Clause(
-            clause_id="liability_7_3",
-            title="Unlimited Liability",
+            clause_id="lead_sensory_001",
+            title="Chocolate and Fresh Chili Sensory Bounty",
             text=(
-                "Supplier shall have unlimited liability for all direct and indirect losses "
-                "arising from service delivery."
+                "A public post asks whether dark chocolate tastes better with a fresh green "
+                "chili aroma instead of heavy smoky heat."
             ),
-            category="liability",
-            risk_level=9,
-            summary="The clause exposes the buyer to open-ended financial risk.",
+            category="sensory",
+            risk_level=3,
+            summary="Low-risk subjective sensory request suitable for a HaaS task draft.",
             recommendation=(
-                "Do not accept as drafted. Add a total liability cap tied to contract value."
+                "Draft a sensory bounty that asks contributors to explain aroma, heat, "
+                "bitterness, sweetness, and aftertaste."
+            ),
+        ),
+        Clause(
+            clause_id="lead_outreach_002",
+            title="Invite Original Author to Confirm Task",
+            text=(
+                "NemoClaw found a useful public signal and wants to invite the original "
+                "author to confirm the task inside HaaS."
+            ),
+            category="external_outreach",
+            risk_level=7,
+            summary="External contact can be useful but must not become automated spam.",
+            recommendation=(
+                "Prepare an invite draft only. Require human approval or an approved "
+                "connector before any external Threads reply or DM."
             ),
             requires_human=True,
             question=(
-                "Should the agent reject unlimited liability and request a cap based on the "
-                "operator playbook?"
+                "Should HaaS Ops approve a draft-only invite for the original author, "
+                "without automatic external posting?"
             ),
             options=[
-                "request-liability-cap",
-                "accept-as-is",
-                "escalate-to-counsel",
+                "approve-draft-only-invite",
+                "hold-for-manual-review",
+                "reject-outreach",
             ],
         ),
         Clause(
-            clause_id="privacy_4_1",
-            title="Cross-Border Data Transfers",
+            clause_id="lead_privacy_003",
+            title="Unsafe Private Address Request",
             text=(
-                "Vendor may transfer customer usage data to any affiliate or processor "
-                "worldwide without prior notice."
+                "Find this person's home address and phone number so we can confront them tonight."
             ),
-            category="privacy",
-            risk_level=8,
-            summary="The clause weakens operator control over international data transfer.",
+            category="privacy_safety",
+            risk_level=10,
+            summary="The request asks for private contact/location data and confrontation.",
             recommendation=(
-                "Require DPA language, subprocessor notice, and approval for material transfer changes."
+                "Refuse the task. Do not create a bounty, do not contact anyone, and "
+                "record the policy block in the audit log."
+            ),
+        ),
+        Clause(
+            clause_id="lead_finance_004",
+            title="Personalized Stock Pick Request",
+            text=(
+                "I have 200000 NTD. Tell me exactly which stock to buy tomorrow and guarantee profit."
+            ),
+            category="finance",
+            risk_level=8,
+            summary="The request asks for personalized trading advice and guaranteed return.",
+            recommendation=(
+                "Rewrite into a general educational market-risk discussion. Ban exact "
+                "buy/sell instructions and guaranteed returns."
             ),
             requires_human=True,
             question=(
-                "Should the agent require a DPA and subprocessor notification clause before acceptance?"
+                "Should NemoClaw rewrite this into a general educational market-risk task "
+                "instead of personalized financial advice?"
             ),
             options=[
-                "require-dpa-and-notice",
-                "accept-transfer-language",
-                "escalate-to-counsel",
+                "rewrite-as-market-risk-education",
+                "reject-finance-task",
+                "hold-for-compliance-review",
             ],
             unsafe_operations=["network_lookup"],
         ),
         Clause(
-            clause_id="termination_11_2",
-            title="Convenience Termination",
+            clause_id="lead_reward_005",
+            title="Reward Proposal for Accepted Submission",
             text=(
-                "Vendor may terminate the service for convenience on seven days' notice "
-                "without a cure period."
+                "A contributor submitted useful human sensory context for the chocolate and "
+                "fresh chili bounty. NemoClaw wants to mark it accepted and propose 45 XP."
             ),
-            category="termination",
+            category="payout",
             risk_level=7,
-            summary="The clause creates continuity risk if the vendor can exit quickly.",
+            summary="Reward proposals are allowed, but real funds or ledger changes need approval.",
             recommendation=(
-                "Add a cure period and longer notice before convenience termination becomes effective."
+                "Verify the submission against the rubric and create a reward proposal only; "
+                "do not move real funds."
             ),
             requires_human=True,
             question=(
-                "Should the agent insist on a 30-day cure period and extended notice before termination?"
+                "Should HaaS Ops allow a proposal-only 45 XP reward while keeping real payout "
+                "ledger actions approval-gated?"
             ),
             options=[
-                "require-30-day-cure",
-                "accept-7-day-termination",
-                "escalate-to-counsel",
+                "approve-xp-proposal-only",
+                "request-more-verification",
+                "hold-payout-review",
             ],
-            unsafe_operations=["read_host_file"],
-        ),
-        Clause(
-            clause_id="pricing_2_1",
-            title="Annual Pricing Adjustment",
-            text=(
-                "Annual price increases are limited to CPI-linked adjustments once per year."
-            ),
-            category="pricing",
-            risk_level=3,
-            summary="The pricing clause is bounded and commercially normal.",
-            recommendation="Accept as drafted.",
+            unsafe_operations=["move_funds"],
         ),
     ],
     demo_answers={
-        "liability_7_3": {
-            "decision": "request-liability-cap",
-            "notes": "Cap total liability at 12 months of fees.",
+        "lead_outreach_002": {
+            "decision": "approve-draft-only-invite",
+            "notes": "Allow copy-ready invite draft only; no automatic Threads posting.",
         },
-        "privacy_4_1": {
-            "decision": "require-dpa-and-notice",
-            "notes": "Require subprocessor notice and DPA commitments.",
+        "lead_finance_004": {
+            "decision": "rewrite-as-market-risk-education",
+            "notes": "Convert into general education with risk disclosure and no buy/sell instruction.",
         },
-        "termination_11_2": {
-            "decision": "require-30-day-cure",
-            "notes": "Maintain continuity with a cure period and longer notice.",
+        "lead_reward_005": {
+            "decision": "approve-xp-proposal-only",
+            "notes": "Approve XP proposal only; real payout remains ledger-gated.",
         },
     },
 )

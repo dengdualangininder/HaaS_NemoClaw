@@ -1,31 +1,22 @@
 # SETUP
 
-## Goal
-
-Open and run the repo in a restricted NemoClaw-style environment without installing third-party packages.
-
 ## Requirements
 
-- Python 3.11+ recommended
-- No npm
-- No pip install required for the default demo path
+Default demo path:
 
-## Project open sequence
+- Python 3.10+
+- Python standard library only
+- no `pip install`
+- no external API key
+- no internet access required
 
-1. Open the project root.
-2. Confirm Python is available:
-
-```bash
-python3 --version
-```
-
-3. Run the offline demo:
+## Start
 
 ```bash
 python3 main.py demo
 ```
 
-4. Or run the visual dashboard:
+## Visual Dashboard
 
 ```bash
 python3 main.py ui --port 8765
@@ -37,81 +28,41 @@ Open:
 http://127.0.0.1:8765
 ```
 
-Dashboard runtime modes:
+If OpenClaw runs inside a Docker sandbox and needs to reach a host dashboard, use:
 
-- `Offline Demo`: no key required, no network required
-- `NVIDIA NIM`: enter the API key in the browser, choose a model, click `Connect NIM`, then start a run
-
-## Dependency model
-
-The default path uses only Python standard library modules:
-
-- `argparse`
-- `dataclasses`
-- `datetime`
-- `json`
-- `pathlib`
-- `sqlite3`
-- `urllib`
-- `uuid`
-
-No `requirements.txt` install step is needed.
-
-## Runtime files
-
-The app writes only project-owned runtime state:
-
-- `runtime/haas_nemoclaw.db`
-
-This database is created automatically on first run.
-
-## Optional live Nemotron setup
-
-Only do this if the environment is allowed to reach NVIDIA NIM:
-
-```bash
-python3 main.py ui --port 8765
+```text
+http://host.docker.internal:8765
 ```
 
-Then in the browser:
+or bind the dashboard to all interfaces:
 
-1. Switch the inference panel to `NVIDIA NIM`
-2. Paste `NVIDIA_API_KEY`
-3. Keep `https://integrate.api.nvidia.com/v1` unless you use another endpoint
-4. Select a model
-5. Click `Connect NIM`
-6. Start a run
+```bash
+python3 main.py ui --host 0.0.0.0 --port 8765
+```
 
-CLI alternative:
+## Runtime State
+
+Default SQLite database:
+
+```text
+runtime/haas_nemoclaw.db
+```
+
+Use a custom path:
+
+```bash
+python3 main.py --db runtime/demo.db demo
+```
+
+## Verify
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+## Optional Live NIM
 
 ```bash
 export NVIDIA_API_KEY="<your-key>"
-export NIM_BASE_URL="https://integrate.api.nvidia.com/v1"
 python3 main.py demo --reasoner nim --nim-model nvidia/nemotron-3-super-120b-a12b
 ```
-
-If the environment is restricted, stay on the default `scripted_nemotron` backend.
-
-## What NemoClaw should open first
-
-1. `README.md`
-2. `DEMO.md`
-3. `ARCHITECTURE.md`
-4. `SAFETY.md`
-
-## Troubleshooting
-
-If you see “run not found”:
-
-- Re-check the `run_id`
-- Confirm the same project directory is being used
-- Inspect current runs:
-
-```bash
-python3 main.py runs
-```
-
-If you see “NVIDIA_API_KEY is required”:
-
-- You selected the live NIM backend without connecting credentials
-- Either connect from the dashboard, set the environment variable, or switch back to the default offline backend

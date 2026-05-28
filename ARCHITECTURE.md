@@ -1,19 +1,20 @@
 # ARCHITECTURE
 
-## Problem definition
+## Problem Definition
 
-The agent solves a bounded but real task:
+The agent solves a bounded but real HaaS operations task:
 
-> Produce an actionable negotiation review for a SaaS vendor contract while forcing human involvement at subjective or high-risk decision points.
+> Produce an actionable ops review for public help signals while forcing human involvement before external outreach, payout-sensitive actions, personalized finance content, or unsafe privacy decisions.
 
 Success is measured by:
 
-- risk clauses identified correctly from bundled scenario data
-- human gates enforced before sensitive decisions
+- public-signal leads reviewed from bundled scenario data
+- high-risk leads flagged
+- human gates enforced before outreach and reward-sensitive decisions
 - durable state across interruption
-- reproducible final report generation
+- reproducible HaaS ops report generation
 
-## State machine
+## State Machine
 
 ```text
 created
@@ -25,99 +26,55 @@ created
   -> completed
 ```
 
-### State meanings
+State meanings:
 
-- `created`: run exists, no work performed yet
-- `planning`: review plan is generated
-- `analyzing`: clauses are processed one by one
-- `waiting_human`: a policy-rewritten decision requires operator input
-- `synthesizing`: findings are compiled into the final report
-- `completed`: the final report is stored and printable
+- `created`: run exists, no work performed yet.
+- `planning`: HaaS ops review plan is generated.
+- `analyzing`: public-signal leads are processed one by one.
+- `waiting_human`: a policy-rewritten decision requires operator input.
+- `synthesizing`: findings are compiled into the final ops report.
+- `completed`: the final report is stored and printable.
 
-## Persistence model
+## Persistence Model
 
 SQLite is the single durable store.
 
-### `runs`
+`runs` stores run id, scenario id, reasoner backend, target model, status, phase, latest state snapshot, and final report.
 
-Stores:
+`checkpoints` stores checkpoint id, run id, lead id, human question, allowed options, status, chosen answer, and notes.
 
-- run id
-- scenario id
-- reasoner backend
-- target model
-- status and phase
-- latest state snapshot
-- final report
+`events` stores an append-only audit trail for planning, lead analysis, guardrail decisions, checkpoint creation, checkpoint answers, and report completion.
 
-### `checkpoints`
-
-Stores:
-
-- checkpoint id
-- linked run id
-- human question
-- allowed options
-- status
-- chosen answer and notes
-
-### `events`
-
-Append-only audit trail for:
-
-- plan creation
-- clause analysis
-- guardrail decisions
-- checkpoint creation
-- checkpoint response
-- report completion
-
-## Planning and execution flow
+## Planning and Execution Flow
 
 ```text
-CLI command
+CLI or dashboard command
   -> load or create run
-  -> load scenario
+  -> load bundled HaaS scenario
   -> select reasoner backend
-  -> execute state-machine step
+  -> execute one state-machine step
   -> evaluate policy for each proposed operation
   -> persist snapshot + event
   -> stop on checkpoint or completion
 ```
 
-## Reasoner abstraction
+## Reasoner Abstraction
 
-### `scripted_nemotron`
-
-Purpose:
+`scripted_nemotron`:
 
 - deterministic offline demo path
 - repeatable judging flow
 - no dependency on network or hosted inference
+- emits structured HaaS ops plans, lead findings, and final reports
 
-Behavior:
-
-- emits a structured plan
-- analyzes clauses using bundled scenario metadata
-- proposes operations that the guardrail layer can inspect
-- synthesizes a final report
-
-### `nim`
-
-Purpose:
+`nim`:
 
 - optional live Nemotron backend
 - same interface as the offline reasoner
-
-Behavior:
-
 - uses NIM-compatible `POST /v1/chat/completions`
-- expects JSON output for clause analysis and report synthesis
-- is not required for the default restricted-environment demo
+- not required for restricted demo
 
-## Guardrail position in the stack
-
-The guardrail layer sits between the reasoner and the engine.
+## Guardrail Position
 
 ```text
 reasoner proposes action
@@ -128,43 +85,32 @@ reasoner proposes action
   -> engine persists result
 ```
 
-This is the repo’s concrete mapping of the NemoClaw idea:
+The model can propose, but policy decides whether the proposal is executable. The engine cannot silently skip policy outcomes.
 
-- the model can propose
-- policy decides whether that proposal is executable
-- the engine cannot silently skip policy outcomes
+## Implemented Policy Patterns
 
-## Implemented policy patterns
-
-### Reject
-
-Used for:
+Reject:
 
 - external network lookups in restricted mode
-- host filesystem reads outside app-owned runtime state
+- arbitrary host file reads
 - finalization while unresolved checkpoints remain
 
-### Rewrite
+Rewrite:
 
-Used for:
-
-- high-risk auto-accept decisions
-- subjective business judgment calls
+- high-risk marketplace decisions
+- external outreach
+- reward-sensitive actions
+- personalized finance content that can become educational discussion
 
 Rewrite target:
 
 - `create_checkpoint`
 
-## Memory model
-
-This project intentionally separates:
-
-- transient reasoning context
-- durable operational state
+## Memory Model
 
 Durable memory includes:
 
-- reviewed clauses
+- reviewed leads
 - pending decisions
 - answered checkpoints
 - guardrail interventions
@@ -172,25 +118,6 @@ Durable memory includes:
 
 This makes resume behavior deterministic even after the Python process exits.
 
-## Why no arbitrary file access
+## Why SQLite
 
-The demo does not ask the agent to open user-provided local files because that conflicts with the stated NemoClaw constraint.
-
-Instead, the demo uses:
-
-- bundled scenario content
-- bundled operator policy defaults
-- project-owned runtime state
-
-This keeps the demo faithful to a restricted sandbox while still demonstrating long-running autonomy.
-
-## Why SQLite instead of an external service
-
-SQLite is enough here because:
-
-- single-process demo
-- no dependency installation
-- easy reset and inspection
-- robust enough for interruption/resume
-
-It also directly supports the competition goal of a deployable agent on personal hardware.
+SQLite is enough because this is a single-process demo, needs no dependency installation, is easy to reset and inspect, and is robust enough for interruption/resume.
