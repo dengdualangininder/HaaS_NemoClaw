@@ -252,7 +252,7 @@ CLI flow:
 
 ```bash
 export NVIDIA_API_KEY="<your-key>"
-python3 main.py demo --reasoner nim --nim-model nvidia/llama-3.3-nemotron-super-49b-v1
+python3 main.py demo --reasoner nim --nim-model nvidia/nemotron-3-super-120b-a12b
 ```
 
 Supported environment variables:
@@ -262,12 +262,9 @@ Supported environment variables:
 
 Recommended hosted model IDs for the dashboard:
 
-- `nvidia/llama-3.3-nemotron-super-49b-v1.5`
-- `nvidia/llama-3.3-nemotron-super-49b-v1`
 - `nvidia/nemotron-3-super-120b-a12b`
-- `meta/llama-3.3-70b-instruct`
-- `meta/llama-3.1-8b-instruct`
-- `openai/gpt-oss-20b`
+- `nvidia/nemotron-3-nano-30b-a3b`
+- `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`
 
 ## Official NemoClaw alignment
 

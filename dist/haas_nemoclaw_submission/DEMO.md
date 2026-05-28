@@ -41,7 +41,7 @@ python3 main.py ui --port 8765
 3. In the `Inference` panel, select `NVIDIA NIM`
 4. Enter `NVIDIA_API_KEY`
 5. Keep the base URL as `https://integrate.api.nvidia.com/v1`
-6. Pick a model such as `nvidia/llama-3.3-nemotron-super-49b-v1.5`
+6. Pick a model such as `nvidia/nemotron-3-super-120b-a12b`
 7. Click `Connect NIM`
 8. Click `Start Demo Run`
 9. Show that the selected run now displays `NVIDIA NIM` in the `Engine` metric and the chosen model in the `Runtime` section
@@ -157,7 +157,7 @@ If you prefer CLI instead of the browser:
 
 ```bash
 export NVIDIA_API_KEY="<your-key>"
-python3 main.py demo --reasoner nim --nim-model nvidia/llama-3.3-nemotron-super-49b-v1
+python3 main.py demo --reasoner nim --nim-model nvidia/nemotron-3-super-120b-a12b
 ```
 
 This uses the same long-agent flow, but swaps the offline adapter for a live Nemotron backend.

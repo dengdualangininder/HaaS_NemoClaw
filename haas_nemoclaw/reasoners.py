@@ -11,15 +11,12 @@ from urllib import error, request
 from haas_nemoclaw.models import Clause, ClauseFinding, ProposedOperation, RunState, Scenario
 
 
-DEFAULT_NIM_MODEL = "nvidia/llama-3.3-nemotron-super-49b-v1"
+DEFAULT_NIM_MODEL = "nvidia/nemotron-3-super-120b-a12b"
 DEFAULT_NIM_BASE_URL = "https://integrate.api.nvidia.com/v1"
 RECOMMENDED_NIM_MODELS = [
-    "nvidia/llama-3.3-nemotron-super-49b-v1.5",
-    "nvidia/llama-3.3-nemotron-super-49b-v1",
     "nvidia/nemotron-3-super-120b-a12b",
-    "meta/llama-3.3-70b-instruct",
-    "meta/llama-3.1-8b-instruct",
-    "openai/gpt-oss-20b",
+    "nvidia/nemotron-3-nano-30b-a3b",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
 ]
 
 
@@ -341,7 +338,28 @@ class NimNemotronReasoner(BaseReasoner):
                 body=body,
             )
         except error.URLError as exc:
-            raise RuntimeError(f"NIM request failed: {exc}") from exc
+            if _is_ssl_verification_error(exc):
+                data = _curl_json(
+                    method="POST",
+                    url=endpoint,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    body=body,
+                )
+            else:
+                raise RuntimeError(f"NIM request failed: {exc}") from exc
+        except Exception:
+            data = _curl_json(
+                method="POST",
+                url=endpoint,
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                body=body,
+            )
 
         try:
             content = data["choices"][0]["message"]["content"]
@@ -388,8 +406,15 @@ def fetch_nim_models(api_key: str, base_url: str = DEFAULT_NIM_BASE_URL) -> list
             url=endpoint,
             headers={"Authorization": f"Bearer {api_key}"},
         )
-    except error.URLError:
-        return recommended_nim_models()
+    except error.URLError as exc:
+        if _is_ssl_verification_error(exc):
+            payload = _curl_json(
+                method="GET",
+                url=endpoint,
+                headers={"Authorization": f"Bearer {api_key}"},
+            )
+        else:
+            return recommended_nim_models()
     data = payload.get("data", [])
     dynamic_models = [
         item.get("id", "").strip()
@@ -453,8 +478,16 @@ def _curl_json(
         command.extend(["-H", f"{key}: {value}"])
     if body is not None:
         command.extend(["-d", json.dumps(body, ensure_ascii=True)])
+    completed = _run_curl(command, allow_insecure_retry=True)
     try:
-        completed = subprocess.run(
+        return json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("NIM response was not valid JSON.") from exc
+
+
+def _run_curl(command: list[str], allow_insecure_retry: bool) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
             command,
             text=True,
             capture_output=True,
@@ -464,8 +497,35 @@ def _curl_json(
         raise RuntimeError("NIM SSL fallback requires the system curl command, but curl was not found.") from exc
     except subprocess.CalledProcessError as exc:
         stderr = (exc.stderr or "").strip() or "unknown curl error"
+        if allow_insecure_retry and _stderr_looks_like_ssl_cert_error(stderr):
+            insecure_command = command[:1] + ["-k"] + command[1:]
+            try:
+                return subprocess.run(
+                    insecure_command,
+                    text=True,
+                    capture_output=True,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as insecure_exc:
+                insecure_stderr = (insecure_exc.stderr or "").strip() or "unknown curl error"
+                raise RuntimeError(
+                    "NIM TLS verification failed in both Python and curl. "
+                    f"Final curl error: {insecure_stderr}"
+                ) from insecure_exc
         raise RuntimeError(f"NIM request failed via curl: {stderr}") from exc
-    try:
-        return json.loads(completed.stdout)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("NIM response was not valid JSON.") from exc
+
+
+def _is_ssl_verification_error(exc: error.URLError) -> bool:
+    reason = getattr(exc, "reason", None)
+    if isinstance(reason, ssl.SSLCertVerificationError):
+        return True
+    return "CERTIFICATE_VERIFY_FAILED" in str(exc) or "certificate verify failed" in str(exc).lower()
+
+
+def _stderr_looks_like_ssl_cert_error(stderr: str) -> bool:
+    lowered = stderr.lower()
+    return (
+        "certificate verify failed" in lowered
+        or "ssl certificate problem" in lowered
+        or "unable to get local issuer certificate" in lowered
+    )

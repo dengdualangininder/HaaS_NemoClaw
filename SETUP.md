@@ -87,7 +87,7 @@ CLI alternative:
 ```bash
 export NVIDIA_API_KEY="<your-key>"
 export NIM_BASE_URL="https://integrate.api.nvidia.com/v1"
-python3 main.py demo --reasoner nim --nim-model nvidia/llama-3.3-nemotron-super-49b-v1
+python3 main.py demo --reasoner nim --nim-model nvidia/nemotron-3-super-120b-a12b
 ```
 
 If the environment is restricted, stay on the default `scripted_nemotron` backend.
