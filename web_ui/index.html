@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HaaS NemoClaw Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/dashboard.css" />
+</head>
+<body>
+  <div class="topbar">
+    <span class="crumb">HaaS</span>
+    <span class="sep">/</span>
+    <span>nemo.dashboard</span>
+    <span class="sep">/</span>
+    <span class="live">local runtime</span>
+    <div class="right">
+      <span class="topbar-badge">visual runtime</span>
+      <span class="topbar-badge acc">Downloads UI + Long Agent</span>
+    </div>
+  </div>
+
+  <div class="shell">
+    <section class="panel">
+      <div class="panel-h">
+        <div class="brand">
+          <div class="glyph">H</div>
+          <div>
+            <div class="name">HaaS</div>
+            <div class="tagline">human · as · a · service</div>
+          </div>
+        </div>
+        <div class="pill-live" id="run-count-pill">0 runs loaded</div>
+      </div>
+
+      <div class="workspace">
+        <div class="toolbar">
+          <button class="btn-help compact" id="new-run-btn">Start Demo Run</button>
+          <button class="btn-skip compact" id="new-auto-run-btn">Start Auto Run</button>
+          <button class="btn-skip compact" id="refresh-btn">Refresh</button>
+        </div>
+
+        <div class="two-col">
+          <div class="col">
+            <div class="lab acc">Runs</div>
+            <div id="runs-list" class="list-block"></div>
+          </div>
+
+          <div class="col">
+            <div class="lab acc">Run Detail</div>
+            <div id="run-detail" class="detail-block empty-state">
+              Select a run to inspect status, checkpoints, events, and report.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="inference-panel">
+        <div class="head">▸ Inference</div>
+        <div id="inference-panel" class="scroll-body empty-state">
+          Loading runtime configuration...
+        </div>
+      </div>
+
+      <div class="online-panel">
+        <div class="head">▸ Checkpoints</div>
+        <div id="checkpoint-panel" class="scroll-body empty-state">
+          Select a run to answer pending checkpoints.
+        </div>
+      </div>
+
+      <div class="helped-panel">
+        <div class="big" id="event-count">0</div>
+        <div class="label">events in selected run</div>
+        <div class="avatars">
+          <div class="a">⚙</div>
+          <div class="a">🧠</div>
+          <div class="a">🧑</div>
+          <div class="a">📝</div>
+          <span class="more" id="run-status-chip">idle</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
