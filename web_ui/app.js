@@ -62,6 +62,16 @@ function summarizeRun(run) {
   return `${findings} findings recorded so far`;
 }
 
+function visibleNemotronModels(models) {
+  return (models || []).filter((model) => {
+    const text = String(model);
+    return (
+      text.startsWith("nvidia/nemotron-3-super-") ||
+      text.startsWith("nvidia/nemotron-3-nano-")
+    );
+  });
+}
+
 async function api(path, options = {}) {
   const response = await fetch(path, {
     headers: { "Content-Type": "application/json" },
@@ -96,7 +106,11 @@ function syncRuntime(runtime) {
   if (!state.selectedReasoner) {
     state.selectedReasoner = runtime.default_reasoner || "scripted_nemotron";
   }
+  if (runtime.nim?.connected && state.selectedReasoner !== "nim") {
+    state.selectedReasoner = "nim";
+  }
   renderInferencePanel();
+  renderToolbarLabels();
 }
 
 async function loadRuntime() {
@@ -208,6 +222,7 @@ async function connectNim() {
   state.runtime.nim = data.nim;
   state.selectedReasoner = "nim";
   renderInferencePanel();
+  renderToolbarLabels();
   const keyField = el("nim-api-key");
   if (keyField) keyField.value = "";
 }
@@ -223,6 +238,7 @@ async function disconnectNim() {
     state.selectedReasoner = "scripted_nemotron";
   }
   renderInferencePanel();
+  renderToolbarLabels();
 }
 
 function renderRuns() {
@@ -409,7 +425,8 @@ function renderInferencePanel() {
 
   const nim = runtime.nim || {};
   const isNim = (state.selectedReasoner || runtime.default_reasoner) === "nim";
-  const modelOptions = (nim.models || []).map((model) => `
+  const connectLabel = nim.connected ? "Connected" : "Connect NIM";
+  const modelOptions = visibleNemotronModels(nim.models).map((model) => `
     <option value="${escapeHtml(model)}" ${model === nim.model_name ? "selected" : ""}>${escapeHtml(model)}</option>
   `).join("");
 
@@ -434,6 +451,9 @@ function renderInferencePanel() {
           <span class="option-pill ${nim.connected ? "option-pill-live" : ""}">${nim.connected ? "Connected" : "Not Connected"}</span>
           <span class="option-pill">${escapeHtml(nim.source || "none")}</span>
         </div>
+        <div class="runtime-banner ${nim.connected ? "runtime-banner-live" : ""}">
+          ${nim.connected ? "NIM session is ready. New runs will use the selected hosted Nemotron model." : "No active NIM session. Offline demo remains available."}
+        </div>
         <div class="inference-copy">${nim.connected ? `Active model: ${nim.model_name}` : "Enter an NVIDIA API key, choose a model, and connect before starting a live NIM run."}</div>
         <div class="inference-copy subtle">${nim.key_hint ? `Credential hint: ${nim.key_hint}` : "API key is kept in host memory only and is not written to the SQLite runtime."}</div>
       </div>
@@ -451,7 +471,7 @@ function renderInferencePanel() {
       <input id="nim-api-key" class="text-input" type="password" placeholder="nvapi-..." />
 
       <div class="toolbar stacked">
-        <button class="btn-help compact wide" id="nim-connect-btn">Connect NIM</button>
+        <button class="btn-help compact wide" id="nim-connect-btn" ${nim.connected ? "disabled" : ""}>${connectLabel}</button>
         <button class="btn-skip compact wide" id="nim-disconnect-btn" ${nim.connected ? "" : "disabled"}>Disconnect</button>
       </div>
     </div>
@@ -461,6 +481,7 @@ function renderInferencePanel() {
     input.addEventListener("change", () => {
       state.selectedReasoner = input.value;
       renderInferencePanel();
+      renderToolbarLabels();
     });
   });
 
@@ -512,11 +533,26 @@ function wireToolbar() {
   });
 }
 
+function renderToolbarLabels() {
+  const reasoner = state.selectedReasoner || "scripted_nemotron";
+  const primary = el("new-run-btn");
+  const secondary = el("new-auto-run-btn");
+  if (!primary || !secondary) return;
+  if (reasoner === "nim") {
+    primary.textContent = "Start NIM Run";
+    secondary.textContent = "Start Auto NIM Run";
+  } else {
+    primary.textContent = "Start Demo Run";
+    secondary.textContent = "Start Auto Run";
+  }
+}
+
 async function init() {
   wireToolbar();
   try {
     await loadRuntime();
     await loadRuns();
+    renderToolbarLabels();
   } catch (error) {
     el("run-detail").innerHTML = `<div class="empty-state">Failed to load dashboard: ${escapeHtml(error.message)}</div>`;
   }
