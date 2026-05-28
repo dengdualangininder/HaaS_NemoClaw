@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
+import subprocess
 from dataclasses import dataclass
 from typing import Any
 from urllib import error, request
@@ -46,6 +48,16 @@ class BaseReasoner:
 
 def recommended_nim_models() -> list[str]:
     return list(RECOMMENDED_NIM_MODELS)
+
+
+def _default_ssl_context() -> ssl.SSLContext:
+    context = ssl.create_default_context()
+    try:
+        import certifi  # type: ignore
+    except ImportError:
+        return context
+    context.load_verify_locations(cafile=certifi.where())
+    return context
 
 
 class ScriptedNemotronReasoner(BaseReasoner):
@@ -316,8 +328,18 @@ class NimNemotronReasoner(BaseReasoner):
             method="POST",
         )
         try:
-            with request.urlopen(req, timeout=60) as resp:
+            with request.urlopen(req, timeout=60, context=_default_ssl_context()) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
+        except ssl.SSLCertVerificationError:
+            data = _curl_json(
+                method="POST",
+                url=endpoint,
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                body=body,
+            )
         except error.URLError as exc:
             raise RuntimeError(f"NIM request failed: {exc}") from exc
 
@@ -358,8 +380,14 @@ def fetch_nim_models(api_key: str, base_url: str = DEFAULT_NIM_BASE_URL) -> list
         method="GET",
     )
     try:
-        with request.urlopen(req, timeout=30) as resp:
+        with request.urlopen(req, timeout=30, context=_default_ssl_context()) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
+    except ssl.SSLCertVerificationError:
+        payload = _curl_json(
+            method="GET",
+            url=endpoint,
+            headers={"Authorization": f"Bearer {api_key}"},
+        )
     except error.URLError:
         return recommended_nim_models()
     data = payload.get("data", [])
@@ -411,3 +439,33 @@ def _merge_model_lists(*groups: list[str]) -> list[str]:
             seen.add(normalized)
             merged.append(normalized)
     return merged
+
+
+def _curl_json(
+    *,
+    method: str,
+    url: str,
+    headers: dict[str, str],
+    body: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    command = ["curl", "--silent", "--show-error", "--fail", "-X", method, url]
+    for key, value in headers.items():
+        command.extend(["-H", f"{key}: {value}"])
+    if body is not None:
+        command.extend(["-d", json.dumps(body, ensure_ascii=True)])
+    try:
+        completed = subprocess.run(
+            command,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError("NIM SSL fallback requires the system curl command, but curl was not found.") from exc
+    except subprocess.CalledProcessError as exc:
+        stderr = (exc.stderr or "").strip() or "unknown curl error"
+        raise RuntimeError(f"NIM request failed via curl: {stderr}") from exc
+    try:
+        return json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("NIM response was not valid JSON.") from exc
